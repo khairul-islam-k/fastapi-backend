@@ -1,0 +1,11 @@
+CREATE DATABASE IF NOT EXISTS fastapiDatabase;
+USE fastapiDatabase;
+
+CREATE TABLE `items` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(500),
+    price FLOAT NOT NULL,
+    tax FLOAT NOT NULL,
+    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
