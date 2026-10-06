@@ -15,7 +15,7 @@ def get_db():
     try:
         yield conn
     finally:
-        conn.close
+        conn.close()
 
 @app.get('/')
 def reed_root():
@@ -26,9 +26,15 @@ def read_item(item_id: int, name: str | None = None):
     return {"item_id": item_id, name: name}
 
 @app.post("/items")
-def create_item(item: Item):
-        print(item)
-        return item
+def create_item(item: Item, db=Depends(get_db)):
+    with db.cursor() as cursor:
+        sql = """
+        INSERT INTO items (name, description, price, tax) 
+        VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(sql, (item.name, item.description, item.price, item.tax))
+
+        return cursor.lastrowid
 
 @app.patch("/items/{item_id}")
 def update_item(item_id: int, item: Item):

@@ -3,6 +3,8 @@ from pymysql.cursors import DictCursor
 import os
 from dotenv import load_dotenv
 
+load_dotenv()
+
 def get_database_connection():
     conn = pymysql.connect(
         host= os.getenv("DB_HOST", "localhost"),
