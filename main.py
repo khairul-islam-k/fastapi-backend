@@ -21,9 +21,25 @@ def get_db():
 def reed_root():
     return {"Hello": "World"}
 
+@app.get('/items')
+def all_items(limit: int=5, skip: int=0, db=Depends(get_db)):
+    with db.cursor() as cursor:
+        sql ="""
+        SELECT * FROM items
+        LIMIT %s OFFSET %s
+        """
+        cursor.execute(sql, (limit, skip))
+        return cursor.fetchall()
+
 @app.get("/items/{item_id}")
-def read_item(item_id: int, name: str | None = None):
-    return {"item_id": item_id, name: name}
+def read_item(item_id: int, db=Depends(get_db)):
+    with db.cursor() as cursor:
+            sql ="""
+            SELECT * FROM items
+            WHERE id = %s
+            """
+            cursor.execute(sql, (item_id))
+            return cursor.fetchone()
 
 @app.post("/items")
 def create_item(item: Item, db=Depends(get_db)):
@@ -33,12 +49,12 @@ def create_item(item: Item, db=Depends(get_db)):
         VALUES (%s, %s, %s, %s)
         """
         cursor.execute(sql, (item.name, item.description, item.price, item.tax))
+        db.commit()
 
-        return cursor.lastrowid
+        return {"id": cursor.lastrowid}
 
 @app.patch("/items/{item_id}")
 def update_item(item_id: int, item: Item):
-    print('id', item_id, item)
     return item
 
 @app.delete("/items/{item_id}")
